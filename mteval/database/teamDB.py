@@ -1,4 +1,6 @@
 from pymongo import MongoClient
+from bson.objectid import ObjectId
+
 
 client = MongoClient("localhost", 27017)
 db = client.mteval
@@ -35,4 +37,7 @@ def getTeamByEmail(email):
 	return db.teams.find_one({"email": email})
 
 def getTeamById(teamId):
-	return db.teams.find_one({"_id": teamId})
+	return db.teams.find_one({"_id": ObjectId(teamId)})
+
+def getAdmin():
+	return db.teams.find_one({"isAdmin": True})

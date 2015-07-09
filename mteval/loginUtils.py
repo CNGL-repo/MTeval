@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, flash
 from flask.ext import login
 from werkzeug.security import generate_password_hash, check_password_hash
 from database import teamDB
@@ -6,19 +6,20 @@ from database import teamDB
 class Team(object):
 
 	def __init__(self, teamId, 
-					isAdmin, teamName, email, passwordHash, emailVerified):
+					isAdmin, teamName, email, passwordHash, emailVerified, isActive):
 		self.teamId 		= teamId
 		self.isAdmin 		= isAdmin
 		self.teamName		= teamName
 		self.email			= email
 		self.passwordHash	= passwordHash
 		self.emailVerified  = emailVerified
+		self.isActive 		= isActive
 
 	def is_authenticated(self):
 		return True
 
 	def is_active(self):
-		return True
+		return self.isActive
 
 	def is_anonymous(self):
 		return False
@@ -30,17 +31,16 @@ class Team(object):
 		return self.emailVerified	
 
 
-# #returns a Team object if valid userId, None otherwise
-# def getTeamObject(userId):
-# 	#get the database function
-# 	isPendingUser = False
-# 	user = teamDB.getUserById(userId)
-# 	if user == None or user == {}:
-# 		return None
+#returns a Team object if valid userId, None otherwise
+def getTeamObject(teamId):
+	#get the database function
+	team = teamDB.getTeamById(teamId)
+	if team == None or team == {}:
+		return None
 
-# 	return User(userId, user.get('isApproved'), user.get('isAdmin'), 
-# 				user['username'], user['email'], user['passwordHash'], 
-# 				user.get('apiKey'), user.get('emailVerified'))
+	return Team(str(team.get("_id")), team.get('isAdmin'), 
+				team['teamName'], team['email'], team['passwordHash'], 
+				team.get('emailVerified'), team.get("isActive"))
 
 
 #userStringId can be username or email 
@@ -60,13 +60,13 @@ def loginUser(userStringId, password):
 	
 	print team
 
-	team = Team(str(team.get("_id")), team.get('isAdmin'), 
-				team['teamName'], team['email'], team['passwordHash'], 
-				team.get('emailVerified'))
+	team = getTeamObject(str(team["_id"]))
+
+	print team
 	
-	# if not team.is_active():
-	# 	status['reason'] = 'Error: You registration has not been accepted yet.'
-	# 	return status
+	if not team.is_active():
+		status['reason'] = 'Error: You registration has not been accepted yet.'
+		return status
 
 	# if not team.is_verified():
 	# 	status['reason'] = 'Error: Email not verified'	
@@ -77,7 +77,8 @@ def loginUser(userStringId, password):
 		return status
 
 	#actually log in the user
-	login.login_user(team)
+	print "HI"
+	print login.login_user(team)
 
 	status['isValid'] = True
 
