@@ -8,52 +8,60 @@
 			<div class="panel-group" id="accordian">
 				<div class="panel panel-default">
 					<div class="panel-heading">
-						 <a class="panel-title" data-toggle="collapse" data-parent="accordian" href="#collapse-teamList">Edit team information</a>
+						 <a class="panel-title" data-toggle="collapse" data-parent="" href="#collapse-teamList">Edit team information</a>
 					</div>
 					<div id="collapse-teamList" class="panel-collapse collapse">
 						<div class="panel-body">
-							I am a team list
+							{%if teams|length > 0 %}			
+							<table style="width:100%">
+								<tr>
+									<th>Email</th>
+									<th>Username</th>
+									
+								</tr>
+								{% for team in teams %}
+									<tr>
+										<td>{{team.email}}</td>
+										<td>{{team.teamName}}</td>
+										<td><a href="/editTeam/{{team.teamName}}" >Edit team information</a></td>
+									</tr>
+								{% endfor %}
+								{% endif %}
+							</table>
 						</div>
 					</div>
 				</div>
 				<div class="panel panel-default">
 					<div class="panel-heading">
-						 <a class="panel-title" data-toggle="collapse" data-parent="#accordian" href="#panel-element-285251">Pending teams</a>
+						 <a class="panel-title" data-toggle="collapse" data-parent="" href="#panel-element-285251">Pending teams</a>
 					</div>
 					<div id="panel-element-285251" class="panel-collapse collapse">
 						<div class="panel-body">
-							I am a team list
+							{%if pendingTeams|length > 0 %}			
+								<table style="width:100%">
+									<tr>
+										<th>Email</th>
+										<th>Team Name</th>
+										<th colspan="2"></th>
+									</tr>
+									{% for team in pendingTeams %}
+										<tr>
+											<td>{{team.email}}</td>
+											<td>{{team.teamName}}</td>
+											<td><a href="/acceptTeam/{{team.teamName}}" >Accept</a></td>
+											<td><a href="/rejectTeam/{{team.teamName}}" >Reject</a></td>
+										</tr>
+									{% endfor %}
+								</table>
+							{% else %}
+								<h4>No Pending Teams</h4>
+							{%endif%}
 						</div>
 					</div>
 				</div>
 			</div>
 
 		</div>
-		{%if current_user.isAdmin == True %}
-		<br>
-		<br>
-		<br>
-		<h1 class="listOfFeatures">Users Pending Approval</h2>
-			{%if pendingUsers|length > 0 %}			
-				<table style="width:100%">
-					<tr>
-						<th>Email</th>
-						<th>Username</th>
-						<th colspan="2"></th>
-					</tr>
-						{% for user in pendingUsers %}
-							<tr>
-								<td>{{user.email}}</td>
-								<td>{{user.username}}</td>
-								<td><a href="/acceptUser/{{user._id}}" >Accept</a></td>
-								<td><a href="/rejectUser/{{user._id}}" >Reject</a></td>
-							</tr>
-						{% endfor %}
-				</table>
-			{% else %}
-				<h3>No Pending Users</h3>
-			{%endif%}
-		{%endif%}
 	</div>
 	</div>
 {% endblock %}

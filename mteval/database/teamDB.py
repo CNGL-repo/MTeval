@@ -5,7 +5,7 @@ from bson.objectid import ObjectId
 client = MongoClient("localhost", 27017)
 db = client.mteval
 
-def addTeam(teamName, email, organisation, passwordHash, isAdmin = False, isVerified = False, isActive = False):
+def addTeam(teamName, email, organisation, passwordHash, isAdmin = False, emailVerified = False, isActive = False):
 	res = None
 	team = db.teams.find_one({"teamName": teamName})
 	if team != None:
@@ -20,7 +20,7 @@ def addTeam(teamName, email, organisation, passwordHash, isAdmin = False, isVeri
 		"organisation": organisation,
 		"passwordHash": passwordHash, 
 		"isAdmin": isAdmin,
-		"isVerified": isVerified,
+		"emailVerified": emailVerified,
 		"isActive": isActive
 	}
 
@@ -29,6 +29,9 @@ def addTeam(teamName, email, organisation, passwordHash, isAdmin = False, isVeri
 		"success": True
 	}
 	return res
+
+def removeTeam(teamName):
+	db.teams.delete_one({"teamName": teamName})
 
 def getTeamByName(teamName):
 	return db.teams.find_one({"teamName": teamName})
@@ -39,5 +42,24 @@ def getTeamByEmail(email):
 def getTeamById(teamId):
 	return db.teams.find_one({"_id": ObjectId(teamId)})
 
+def getPendingTeams():
+	teams = db.teams.find({"isActive": False})
+	res = []
+	for team in teams:
+		team["_id"] = str(team["_id"])
+		res.append(team)
+	return res
+
+def getTeamList():
+	teams = db.teams.find()
+	res = []
+	for team in teams:
+		team["_id"] = str(team["_id"])
+		res.append(team)
+	return res
+
 def getAdmin():
 	return db.teams.find_one({"isAdmin": True})
+
+def acceptTeam(teamName):
+	db.teams.update({"teamName": teamName}, {"isActive": True})
