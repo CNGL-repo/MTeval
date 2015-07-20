@@ -25,7 +25,7 @@ if teamDB.getAdmin() == None:
         "admin", 
         loginUtils.hashPassword("password"), 
         isAdmin = True,
-        isVerified = True, 
+        emailVerified = True, 
         isActive = True)
 
 #Application routes
