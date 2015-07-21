@@ -11,9 +11,17 @@ def addTeam(teamName, email, organisation, passwordHash, isAdmin = False, emailV
 	if team != None:
 		res = {
 			"success": False,
-			"reason": "Team already exists"
+			"reason": "Team username already exists"
 		}
 		return res
+	team =db.teams.find_one({"email": email})
+	if team != None:
+		res = {
+			"success": False,
+			"reason": "Team email already exists"
+		}
+		return res
+
 	team = {
 		"teamName": teamName,
 		"email": email, 
@@ -29,6 +37,17 @@ def addTeam(teamName, email, organisation, passwordHash, isAdmin = False, emailV
 		"success": True
 	}
 	return res
+
+def editTeam(oldName, newName, email, organisation, passwordHash):
+	db.teams.update(
+	{"teamName": oldName}, 
+	{"$set": {
+		"teamName": newName,
+		"email": email,
+		"organisation": organisation,
+		"passwordHash": passwordHash
+	}
+	})
 
 def removeTeam(teamName):
 	db.teams.delete_one({"teamName": teamName})
@@ -51,7 +70,7 @@ def getPendingTeams():
 	return res
 
 def getTeamList():
-	teams = db.teams.find()
+	teams = db.teams.find({"isActive": True, "isAdmin": False})
 	res = []
 	for team in teams:
 		team["_id"] = str(team["_id"])
@@ -62,4 +81,4 @@ def getAdmin():
 	return db.teams.find_one({"isAdmin": True})
 
 def acceptTeam(teamName):
-	db.teams.update({"teamName": teamName}, {"isActive": True})
+	db.teams.update({"teamName": teamName}, {"$set": {"isActive": True}})

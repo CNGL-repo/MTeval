@@ -17,14 +17,15 @@
     <!-- Collect the nav links, forms, and other content for toggling -->
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav">
-        <li class="active"><a href="#">About <span class="sr-only">(current)</span></a></li>
-        <li><a href="#">Link</a></li>
+        <li class=""><a href="#">About <span class="sr-only">(current)</span></a></li>
+        <li><a href="{{url_for('competitions')}}">Competitions</a></li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         {% if current_user.isAdmin %}
           <li><a href="{{url_for('adminPanel')}}">Admin panel</a></li>
         {% endif %}
       	{% if current_user.is_authenticated() %}
+          <li><a href="/editTeam/{{current_user.teamName}}">My Team</a></li>
         	<li><a href="{{url_for('logout')}}">Logout</a></li>
         {% else %}
         	<li><a href="{{url_for('login')}}">Login</a></li>

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% from "formhelpers.html" import render_field %}
+
+{% block content %}
+<form method="POST" action="/addCompetition" enctype="multipart/form-data">
+    <dl>{{ render_field(form.name) }}</dl>
+    <dl>{{ render_field(form.description) }}</dl>
+    <dl>{{ render_field(form.deadline) }}</dl>
+    <dl>{{ render_field(form.submissionFormat) }}</dl>
+    <dl>{{ render_field(form.requirements) }}</dl>
+	<dl>{{ render_field(form.organisers) }}</dl>
+    <dl>{{ render_field(form.contact) }}</dl>
+    <dl>{{ render_field(form.testData) }}</dl>
+    <dl>{{ render_field(form.trainingData) }}</dl>
+    
+    <p><input type="submit" value="Submit"></p>
+</form>
+
+
+{% endblock %}

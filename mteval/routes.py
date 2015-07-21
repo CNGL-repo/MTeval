@@ -2,12 +2,14 @@ from mteval import app
 
 from flask import render_template, flash, redirect, url_for, request
 from flask.ext.login import request, current_user, LoginManager, logout_user, login_required
-from forms import LoginForm, RegisterForm, EditTeamForm
-from database import teamDB
+from forms import LoginForm, RegisterForm, EditTeamForm, CompetitionForm
+from database import teamDB, compDB
 import loginUtils
 from itsdangerous import URLSafeTimedSerializer
 from flask_mail import Mail, Message
 from urlparse import urlparse, urljoin
+from werkzeug import secure_filename
+import os
 
 
 #Login manager initialisation
@@ -25,13 +27,14 @@ if teamDB.getAdmin() == None:
         "admin", 
         loginUtils.hashPassword("password"), 
         isAdmin = True,
-        isVerified = True, 
+        emailVerified = True, 
         isActive = True)
 
 #Application routes
 @app.route('/')
 def index():
-    return render_template("base.html")
+    upcomingComps = compDB.getUpcomingCompList()
+    return render_template("index.html", upcomingComps=upcomingComps)
 
 #Route for admin panel, where the admin can do various tasks
 @app.route('/admin')
@@ -119,24 +122,62 @@ def rejectTeam(teamName):
 @app.route("/editTeam/<teamName>", methods=["GET", "POST"])
 def editTeam(teamName):
     #only the current team may edit itself, or the admin may edit every team
-    if current_user.isAdmin != True:
-        flash("You don't have permission to edit this team")
-        return redirect(url_for("index"))
-    elif current_user.teamName != teamName:
+    if current_user.isAdmin != True and current_user.teamName != teamName:
         flash("You don't have permission to edit this team")
         return redirect(url_for("index"))
 
-    form = EditTeamForm()
+    form = EditTeamForm(request.form)
     if request.method == "POST" and form.validate():
         teamDB.editTeam(
+            teamName,
             form.teamname.data, 
             form.email.data,
-            form.organisation.data
+            form.organisation.data,
+            loginUtils.hashPassword(form.password.data)
         )
         flash("Updated team successfully")
         return redirect(url_for("index"))
 
-    return render_template("editTeam.html", form=form)
+    team = teamDB.getTeamByName(teamName)
+    return render_template("editTeam.html", team=team, form=form)
+
+#Competition routes
+@app.route("/competitions")
+def competitions():
+    comps = compDB.getCompList()
+    return render_template("competitions.html", comps=comps)
+
+@app.route("/addCompetition", methods=["GET", "POST"])
+def addCompetition():
+    form = CompetitionForm(request.form)
+    if request.method == "POST" and form.validate():
+        testData = request.files["testData"]
+        trainingData = request.files["trainingData"]
+
+        ##TODO: CHANGE NAMING
+        #overwrites duplicate names
+        testDataName = secure_filename(testData.filename)
+        trainingDataName = secure_filename(trainingData.filename)
+        if testDataName != "":
+            testData.save(os.path.join(app.config["UPLOAD_DIR"], testDataName))
+        if trainingDataName != "":
+            trainingData.save(os.path.join(app.config["UPLOAD_DIR"], trainingDataName))
+        
+        res = compDB.addComp( 
+            form.name.data,
+            form.description.data,
+            form.deadline.data,
+            form.submissionFormat.data,
+            form.requirements.data,
+            form.organisers.data,
+            form.contact.data,
+            testDataName,
+            trainingDataName
+        )
+
+        return redirect(url_for("competitions"))
+
+    return render_template("addCompetition.html", form=form)
 
 @lm.user_loader
 def load_user(userId):

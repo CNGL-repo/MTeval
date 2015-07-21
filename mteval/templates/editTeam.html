@@ -1,1 +1,36 @@
-hello
+{% extends "base.html" %}
+
+{% from "formhelpers.html" import render_field %}
+
+{% block content %}
+<table style="padding:5px; border-spacing:15px">
+	<tr>
+		<th></th>
+		<th>Current</th>
+	</tr>
+		<tr>
+			<td><strong>Team name</strong></td>
+			<td>{{team.teamName}}</td>
+		</tr>
+		<tr>
+			<td><strong>Email </strong></td>
+			<td>{{team.email}}</td>
+		</tr>
+		<tr>
+			<td><strong>Organisation</strong></td>
+			<td>{{team.organisation}}</td>
+		</tr>
+</table>
+
+<br />
+<form method="POST" action="/editTeam/{{team.teamName}}">
+    <dl>{{ render_field(form.teamname) }}</dl>
+    <dl>{{ render_field(form.email) }}</dl>
+    <dl>{{ render_field(form.organisation) }}</dl>
+    {% if current_user.teamName|string() == team.teamName|string() %}
+    <dl>{{ render_field(form.password) }}</dl>
+    <dl>{{ render_field(form.confirm) }}</dl>
+    {% endif %}
+	<p><input type="submit" value="Submit"></p>
+</form>
+{% endblock %}
