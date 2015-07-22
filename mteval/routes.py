@@ -1,6 +1,6 @@
 from mteval import app
 
-from flask import render_template, flash, redirect, url_for, request
+from flask import render_template, flash, redirect, url_for, request, make_response, send_from_directory
 from flask.ext.login import request, current_user, LoginManager, logout_user, login_required
 from forms import LoginForm, RegisterForm, EditTeamForm, CompetitionForm
 from database import teamDB, compDB
@@ -178,6 +178,10 @@ def addCompetition():
         return redirect(url_for("competitions"))
 
     return render_template("addCompetition.html", form=form)
+
+@app.route("/upload/<name>")
+def downloadFile(name):
+    return send_from_directory(app.config["UPLOAD_DIR"], name)
 
 @lm.user_loader
 def load_user(userId):
