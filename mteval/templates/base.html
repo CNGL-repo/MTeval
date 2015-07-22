@@ -11,33 +11,31 @@
       <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
         <span class="sr-only">Toggle navigation</span>
       </button>
-      <a class="navbar-brand" href="{{ url_for('index') }}">MTEval</a>
+      <a class="navbar-brand" href="{{ url_for('home.index') }}">MTEval</a>
     </div>
 
     <!-- Collect the nav links, forms, and other content for toggling -->
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav">
         <li class=""><a href="#">About <span class="sr-only">(current)</span></a></li>
-        <li><a href="{{url_for('competitions')}}">Competitions</a></li>
+        <li><a href="{{url_for('competitions.competitions_home')}}">Competitions</a></li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         {% if current_user.isAdmin %}
-          <li><a href="{{url_for('adminPanel')}}">Admin panel</a></li>
+          <li><a href="{{url_for('admin.adminPanel')}}">Admin panel</a></li>
         {% endif %}
       	{% if current_user.is_authenticated() %}
-          <li><a href="/editTeam/{{current_user.teamName}}">My Team</a></li>
-        	<li><a href="{{url_for('logout')}}">Logout</a></li>
+          <li><a href="/teams/editTeam/{{current_user.teamName}}">My Team</a></li>
+        	<li><a href="{{url_for('home.logout')}}">Logout</a></li>
         {% else %}
-        	<li><a href="{{url_for('login')}}">Login</a></li>
+        	<li><a href="{{url_for('home.login')}}">Login</a></li>
         {% endif %}
-        <li><a href="{{url_for('register')}}">Register</a></li>
+        <li><a href="{{url_for('home.register')}}">Register</a></li>
       </ul>
     </div><!-- /.navbar-collapse -->
   </div><!-- /.container-fluid -->
 	    </div>
-{% endblock %}
-{% block content %}
-{% with messages = get_flashed_messages() %}
+      {% with messages = get_flashed_messages() %}
   {% if messages %}
     <ul class=flashes>
     {% for message in messages %}
@@ -46,4 +44,7 @@
     </ul>
   {% endif %}
 {% endwith %}
+{% endblock %}
+{% block content %}
+
 {% endblock %}

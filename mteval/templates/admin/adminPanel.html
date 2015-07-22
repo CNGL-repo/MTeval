@@ -23,7 +23,7 @@
 									<tr>
 										<td>{{team.email}}</td>
 										<td>{{team.teamName}}</td>
-										<td><a href="/editTeam/{{team.teamName}}" >Edit team information</a></td>
+										<td><a href="/teams/editTeam/{{team.teamName}}" >Edit team information</a></td>
 									</tr>
 								{% endfor %}
 								{% endif %}
@@ -48,8 +48,8 @@
 										<tr>
 											<td>{{team.email}}</td>
 											<td>{{team.teamName}}</td>
-											<td><a href="/acceptTeam/{{team.teamName}}" >Accept</a></td>
-											<td><a href="/rejectTeam/{{team.teamName}}" >Reject</a></td>
+											<td><a href="/admin/acceptTeam/{{team.teamName}}" >Accept</a></td>
+											<td><a href="/admin/rejectTeam/{{team.teamName}}" >Reject</a></td>
 										</tr>
 									{% endfor %}
 								</table>

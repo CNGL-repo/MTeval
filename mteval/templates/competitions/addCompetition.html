@@ -2,7 +2,7 @@
 {% from "formhelpers.html" import render_field %}
 
 {% block content %}
-<form method="POST" action="/addCompetition" enctype="multipart/form-data">
+<form method="POST" action="{{formAction}}" enctype="multipart/form-data">
     <dl>{{ render_field(form.name) }}</dl>
     <dl>{{ render_field(form.description) }}</dl>
     <dl>{{ render_field(form.deadline) }}</dl>

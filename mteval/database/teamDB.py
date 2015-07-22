@@ -80,5 +80,8 @@ def getTeamList():
 def getAdmin():
 	return db.teams.find_one({"isAdmin": True})
 
+def setEmailVerified(teamName):
+	db.teams.update_one({"teamName": teamName}, {"$set": {"emailVerified": True}})
+
 def acceptTeam(teamName):
-	db.teams.update({"teamName": teamName}, {"$set": {"isActive": True}})
+	db.teams.update_one({"teamName": teamName}, {"$set": {"isActive": True}})

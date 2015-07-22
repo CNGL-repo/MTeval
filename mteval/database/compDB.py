@@ -13,7 +13,7 @@ def addComp(compName, description, deadline, submissionFormat, requirements, org
 		"deadline": deadline,
 		"format": submissionFormat, 
 		"requirements": requirements,
-		"organiser": organisers,
+		"organisers": organisers,
 		"contact": contact, 
 		"testData": testData,
 		"trainingData": trainingData
@@ -25,16 +25,16 @@ def addComp(compName, description, deadline, submissionFormat, requirements, org
 	}
 	return res
 
-def editComp(compName, description, deadline, submissionFormat, requirements, organisers, contact, testData, trainingData):
+def editComp(oldName, newName, description, deadline, submissionFormat, requirements, organisers, contact, testData, trainingData):
 	db.competitions.update(
-	{"compName": compName}, 
+	{"compName": oldName}, 
 	{"$set": {
-		"compName": compName,
+		"compName": newName,
 		"description": description,
 		"deadline": deadline,
 		"format": submissionFormat, 
 		"requirements": requirements,
-		"organiser": organisers,
+		"organisers": organisers,
 		"contact": contact, 
 		"testData": testData,
 		"trainingData": trainingData
@@ -44,13 +44,13 @@ def removeComp(compName):
 	db.competitions.delete_one({"compName": compName})
 
 def getCompByName(compName):
-	return db.comps.find_one({"compName": compName})
+	return db.competitions.find_one({"compName": compName})
 
 def getCompByEmail(email):
-	return db.comps.find_one({"email": email})
+	return db.competitions.find_one({"email": email})
 
 def getCompById(compId):
-	return db.comps.find_one({"_id": ObjectId(compId)})
+	return db.competitions.find_one({"_id": ObjectId(compId)})
 
 def getCompList():
 	comps = db.competitions.find()
