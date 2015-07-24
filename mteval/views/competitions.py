@@ -1,12 +1,15 @@
-from mteval import app
+from mteval import app, celery, converters
 from flask import Blueprint, Flask, render_template, request, send_file, redirect, url_for, Response, flash, send_from_directory
 from flask.ext.login import request, current_user, LoginManager, logout_user, login_required
 from mteval.forms import LoginForm, RegisterForm, EditTeamForm, CompetitionForm, CompetitionEditForm
 from mteval.database import teamDB, compDB
+from mteval.decorators import async
 from werkzeug import secure_filename
 import os
+import time
 
-
+#blueprint for competitions
+#prefix: "/comps"
 competitions = Blueprint("competitions", __name__)
 
 
@@ -16,27 +19,35 @@ def competitions_home():
     comps = compDB.getCompList()
     return render_template("competitions/competitions.html", comps=comps)
 
+#Add a competition
+#GET request renders a template with a form to add competitions
+#POST request takes form information and adds a database entry for the competition
 @competitions.route("/addCompetition/", methods=["GET", "POST"])
 @login_required
 def addCompetition():
+    #Only admins should be allowed to add a competition
     if current_user.isAdmin == False:
         flash("You are not an admin")
         return redirect(url_for("competitions.competitions_home"))
 
+    #Form as defined in forms.py
     form = CompetitionForm(request.form)
     if request.method == "POST" and form.validate():
+        #Get the files uploaded by the admin as part of the competition
         testData = request.files["testData"]
         trainingData = request.files["trainingData"]
 
-        ##TODO: CHANGE NAMING
-        #overwrites duplicate names
+        #Clean the names given by the user
         testDataName = secure_filename(testData.filename)
         trainingDataName = secure_filename(trainingData.filename)
+        
+        #Save the files
         if testDataName != "":
             testData.save(os.path.join(app.config["UPLOAD_DIR"], testDataName))
         if trainingDataName != "":
             trainingData.save(os.path.join(app.config["UPLOAD_DIR"], trainingDataName))
         
+        #Add entry in database
         res = compDB.addComp( 
             form.name.data,
             form.description.data,
@@ -51,6 +62,8 @@ def addCompetition():
 
         return redirect(url_for("competitions.competitions_home"))
 
+    #FormAction is passed to the template so it can change the action of the submit button based on whether a competition
+    #is being edited or added
     return render_template("competitions/addCompetition.html", form=form, formAction="/comps/addCompetition/")
 
 @competitions.route("/editCompetition/<name>", methods=["GET", "POST"])
@@ -120,10 +133,33 @@ def downloadFile(name):
 def uploadSubmission():
     if request.method == "POST":
         subData = request.files["file"]
-        compId = request.form.get("compId")
-        teamId = request.form.get("teamId")    
-        subDataName = secure_filename(subData.filename)
-        if subDataName != "":
-            subData.save(os.path.join(app.config["UPLOAD_DIR"], subDataName))
-    return redirect("/")        
+        compName = request.form.get("compName")
+        teamName = request.form.get("teamName")    
         
+        if not allowedFile(subData.filename):
+            flash("File type not accepted")
+            return redirect("/comps")
+
+        subDataName = secure_filename("{0}-{1}-{2}".format(compName, teamName, int(time.time())))
+        filePath = os.path.join(app.config["UPLOAD_DIR"], subDataName)
+        if subDataName != "":
+            try:
+                subData.save(filePath)
+            except Exception:
+                flash("Error saving file, please try to upload again")
+                return redirect("/comps")
+
+        teamDB.appendSub(subDataName, teamName, compName)
+
+    convertToCsv(filePath)
+
+    flash("File uploaded")
+    return redirect("/")        
+    
+
+def allowedFile(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1] in app.config["ALLOWED_EXTENSIONS"]
+@async
+def convertToCsv(filename):
+    converters.SGMLToCSV(filename)
