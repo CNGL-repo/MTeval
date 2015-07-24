@@ -110,7 +110,20 @@ def removeCompetition(name):
 
     return redirect(url_for("competitions.competitions_home"))
 
-@competitions.route("/upload/<name>")
+@competitions.route("/download/<name>")
 @login_required
 def downloadFile(name):
     return send_from_directory(app.config["UPLOAD_DIR"], name)
+
+@competitions.route("/upload", methods = ["GET", "POST"])
+@login_required
+def uploadSubmission():
+    if request.method == "POST":
+        subData = request.files["file"]
+        compId = request.form.get("compId")
+        teamId = request.form.get("teamId")    
+        subDataName = secure_filename(subData.filename)
+        if subDataName != "":
+            subData.save(os.path.join(app.config["UPLOAD_DIR"], subDataName))
+    return redirect("/")        
+        

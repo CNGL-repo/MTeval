@@ -16,7 +16,16 @@
 					 <a class="panel-title" data-toggle="collapse" data-parent="" href="#collapse-{{comp._id}}">{{comp.compName}} </a> [<a href="/comps/editCompetition/{{comp.compName}}"> Edit </a> ] [<a href="/comps/removeCompetition/{{comp.compName}}"> X </a>  ]
 				{% else %}
 					 <a class="panel-title" data-toggle="collapse" data-parent="" href="#collapse-{{comp._id}}">{{comp.compName}} </a>
+				{% if current_user.is_authenticated %}
+					<form method = post action="/comps/upload" enctype="multipart/form-data">
+						<input type="file" name = "file" accept=".sgm, .sgml, .xml">
+						<input type = "hidden" name = "compName" value = "{{comp.compName}}"> 
+						<input type = "hidden" name = "teamName" value = "{{current_user.teamName}}"> 
+						<input type="submit">
+					</form>
 				{% endif %}
+				{% endif %}
+
 				
 				
 
@@ -50,11 +59,11 @@
 						</tr>
 						<tr>
 							<td><strong>Test Data</strong></td>
-							<td><a href="upload/{{comp.testData}}">{{comp.testData}}</td>	
+							<td><a href="/download/{{comp.testData}}">{{comp.testData}}</td>	
 						</tr>
 						<tr>
 							<td><strong>Training Data</strong></td>
-							<td><a href="upload/{{comp.trainingData}}">{{comp.trainingData}}</a></td>	
+							<td><a href="/download/{{comp.trainingData}}">{{comp.trainingData}}</a></td>	
 						</tr>
 					</table>
 				</div>

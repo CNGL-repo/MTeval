@@ -32,7 +32,7 @@ class EditTeamForm(Form):
 class CompetitionForm(Form):
 	name = StringField("Competition Name", [validators.DataRequired("Competition name required")])
 	description = StringField("Competition Description")
-	deadline = DateTimeField("Deadline (dd/mm/yy hh/mm/ss)", format="%d/%m/%Y %H:%M:%S")
+	deadline = DateTimeField("Deadline (dd/mm/yyyy hh:mm:ss)", format="%d/%m/%Y %H:%M:%S")
 	submissionFormat = StringField("Format for submission")
 	requirements = StringField("Requirements")
 	organisers = TextAreaField("Organisers (one per line)")

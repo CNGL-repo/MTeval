@@ -1,5 +1,6 @@
 from pymongo import MongoClient
 from bson.objectid import ObjectId
+import datetime
 
 
 client = MongoClient("localhost", 27017)
@@ -29,7 +30,8 @@ def addTeam(teamName, email, organisation, passwordHash, isAdmin = False, emailV
 		"passwordHash": passwordHash, 
 		"isAdmin": isAdmin,
 		"emailVerified": emailVerified,
-		"isActive": isActive
+		"isActive": isActive,
+		"submissions":[]
 	}
 
 	db.teams.insert_one(team)
@@ -39,7 +41,7 @@ def addTeam(teamName, email, organisation, passwordHash, isAdmin = False, emailV
 	return res
 
 def editTeam(oldName, newName, email, organisation, passwordHash):
-	db.teams.update(
+	db.teams.update_one(
 	{"teamName": oldName}, 
 	{"$set": {
 		"teamName": newName,
@@ -48,6 +50,20 @@ def editTeam(oldName, newName, email, organisation, passwordHash):
 		"passwordHash": passwordHash
 	}
 	})
+
+def appendSub(filename, teamName, compId):
+
+	date = datetime.datetime.now()
+	db.teams.update_one({"teamName": teamName},
+	    {"$push": 
+        {"submissions": 
+            {"filename": filename,
+            "date": date,
+            "compId": compId
+            }
+        }
+    	})
+
 
 def removeTeam(teamName):
 	db.teams.delete_one({"teamName": teamName})
