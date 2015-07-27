@@ -117,19 +117,21 @@ def SGMLToCSVW(input, output = None):
 	docs = soup.findAll("doc")
 	
 
-	header = ("docId", "segId", "segContents")
-	with open(csvName, "w") as f:
+
+	header = ("docId", "segId", "segContents", "sysid", "genre", "origlang")
+	with open(outName, "w") as f:
 		writer = csv.writer(f)
 		writer.writerow(header)
 
 		for doc in docs:
 			docId = doc["docid"]
+			sysid = doc["sysid"]
+			genre = doc["genre"]
+			origlang = doc["origlang"]
 			for seg in doc.findAll("seg"):
 				segId = seg["id"]
 				segText = seg.string
 
-				row = docId, segId, segText
-				writer.writerow(row)
 
 	csvw = template
 	head,tail = os.path.split(fileName)
@@ -139,4 +141,6 @@ def SGMLToCSVW(input, output = None):
 	with open(csvwName, "w") as f:
 		json.dump(csvw, f, indent = 2)
 
+				row = docId, segId, segText, sysid, genre, origlang
+				writer.writerow(row)
 
