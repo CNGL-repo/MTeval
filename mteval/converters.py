@@ -62,16 +62,19 @@ def SGMLToCSV(input, output = None):
 	docs = soup.findAll("doc")
 	
 
-	header = ("docId", "segId", "segContents")
+	header = ("docId", "segId", "segContents", "sysid", "genre", "origlang")
 	with open(outName, "w") as f:
 		writer = csv.writer(f)
 		writer.writerow(header)
 
 		for doc in docs:
 			docId = doc["docid"]
+			sysid = doc["sysid"]
+			genre = doc["genre"]
+			origlang = doc["origlang"]
 			for seg in doc.findAll("seg"):
 				segId = seg["id"]
 				segText = seg.string
 
-				row = docId, segId, segText
+				row = docId, segId, segText, sysid, genre, origlang
 				writer.writerow(row)
