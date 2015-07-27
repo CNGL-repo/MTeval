@@ -1,8 +1,60 @@
 import os
 import csv
+import json
 from BeautifulSoup import BeautifulSoup
 import re
 
+
+template = {
+	"@id": None,
+	"@context": ["http://www.w3.org/ns/csvw",
+        {"@language": "en",
+        "dcterms":"http://purl.org/dc/terms/",
+        "xsd": "http://www.w3.org/2001/XMLSchema#",
+        }],
+    "delimiter": ",",    
+    "tableSchema":{
+    	"columns": [
+    		{"name": "docId",
+    		"title": "docId",
+    		"dcterms:description": "Id of the document",
+    		"dataType": "xsd:string",
+    		"required": "true"
+    		},
+	    	{"name": "segId",
+	    		"title": "segId",
+	    		"dcterms:description": "Id of the segment",
+	    		"dataType": "xsd:integer",
+	    		"required": "true"
+	    		},
+	    	{"name": "segContents",
+	    		"title": "segContents",
+	    		"dcterms:description": "Content of the segment",
+	    		"dataType": "xsd:string",
+	    		"required": "true"
+	    		},
+	    	{"name": "sysid",
+	    		"title": "sysid",
+	    		"dcterms:description": "Id of the system",
+	    		"dataType": "xsd:string",
+	    		"required": "true"
+	    		},
+	    	{"name": "genre",
+	    		"title": "genre",
+	    		"dcterms:description": "genre of the source",
+	    		"dataType": "xsd:string",
+	    		"required": "true"
+	    		},
+	    	{"name": "origlang",
+	    		"title": "origlang",
+	    		"dcterms:description": "Language of the source content",
+	    		"dataType": "xsd:string",
+	    		"required": "true"
+	    		},				
+	],
+	"primaryKey":["sysid", "docId"]
+    }
+}
 # class SGMLToCSV:
 # 	def __init__(self, input = None, output = None):
 # 		self.input = input
@@ -45,11 +97,14 @@ import re
 # if __name__ == "__main__":
 # 	con = SGMLToCSV(input = "test.sgm", output = "out.csv")
 
-def SGMLToCSV(input, output = None):
-	outName = output
+def SGMLToCSVW(input, output = None):
+	csvName = output
+	csvwName = output
+	fileName = os.path.splitext(input)[0]
 	#if output is empty, use the same input name with a different extension
 	if output == None:
-		outName = "{0}.csv".format(os.path.splitext(input)[0])
+		csvName = "{0}.csv".format(fileName)
+		csvwName = "{0}.csvw".format(fileName)
 
 	#make a soup with the input sgml
 	soup = BeautifulSoup(open(input))
@@ -63,7 +118,7 @@ def SGMLToCSV(input, output = None):
 	
 
 	header = ("docId", "segId", "segContents")
-	with open(outName, "w") as f:
+	with open(csvName, "w") as f:
 		writer = csv.writer(f)
 		writer.writerow(header)
 
@@ -75,3 +130,13 @@ def SGMLToCSV(input, output = None):
 
 				row = docId, segId, segText
 				writer.writerow(row)
+
+	csvw = template
+	head,tail = os.path.split(fileName)
+	csvw["@id"] = "http://mt.peep.ie/download/{0}.csv".format(tail)			
+	csvw["@url"] = "http://mt.peep.ie/download/{0}.csv".format(tail)
+
+	with open(csvwName, "w") as f:
+		json.dump(csvw, f, indent = 2)
+
+

@@ -162,4 +162,4 @@ def allowedFile(filename):
            filename.rsplit('.', 1)[1] in app.config["ALLOWED_EXTENSIONS"]
 @async
 def convertToCsv(filename):
-    converters.SGMLToCSV(filename)
+    converters.SGMLToCSVW(filename)
