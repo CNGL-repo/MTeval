@@ -1,0 +1,7 @@
+<!doctype html>
+<title>Submissions</title>
+<ul id="submissionList">
+{%- for item in tree.children recursive %}
+    <li id="submission"><a href="/comps/submissions/{{item.name}}">{{ item.name }}</a>
+{%- endfor %}
+</ul>

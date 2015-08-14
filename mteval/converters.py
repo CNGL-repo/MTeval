@@ -3,54 +3,70 @@ import csv
 import json
 from BeautifulSoup import BeautifulSoup
 import re
-
+import urllib
 
 template = {
 	"@id": None,
 	"@context": ["http://www.w3.org/ns/csvw",
-        {"@language": "en",
+        {
+        "example":"http://example.org/",
+        "@language": "en",
         "dcterms":"http://purl.org/dc/terms/",
         "xsd": "http://www.w3.org/2001/XMLSchema#",
         }],
     "delimiter": ",",    
+    "@type":["Table"],
+
     "tableSchema":{
     	"columns": [
-    		{"name": "docId",
-    		"title": "docId",
-    		"dcterms:description": "Id of the document",
-    		"dataType": "xsd:string",
-    		"required": "true"
+    		{
+	    		"name": "docId",
+	    		"title": "docId",
+	    		"dcterms:description": "Id of the document",
+	    		"dataType": "xsd:string",
+	    		"required": "true",
+	    		"propertyUrl": "example:docId"
     		},
-	    	{"name": "segId",
+	    	{
+		    	"name": "segId",
 	    		"title": "segId",
 	    		"dcterms:description": "Id of the segment",
 	    		"dataType": "xsd:integer",
-	    		"required": "true"
-	    		},
-	    	{"name": "segContents",
+	    		"required": "true",
+	    		"propertyUrl": "example:segId"
+	    	},
+	    	{
+	    		"name": "segContents",
 	    		"title": "segContents",
 	    		"dcterms:description": "Content of the segment",
 	    		"dataType": "xsd:string",
-	    		"required": "true"
-	    		},
-	    	{"name": "sysid",
+	    		"required": "true",
+	    		"propertyUrl": "example:segContents"
+	    	},
+	    	{
+	    		"name": "sysid",
 	    		"title": "sysid",
 	    		"dcterms:description": "Id of the system",
 	    		"dataType": "xsd:string",
-	    		"required": "true"
-	    		},
-	    	{"name": "genre",
+	    		"required": "true",
+	    		"propertyUrl": "example:sysid"
+	    	},
+	    	{
+	    		"name": "genre",
 	    		"title": "genre",
 	    		"dcterms:description": "genre of the source",
 	    		"dataType": "xsd:string",
-	    		"required": "true"
-	    		},
-	    	{"name": "origlang",
+	    		"required": "true",
+	    		"propertyUrl": "example:genre"
+	    	},
+	    	{
+	    		"name": "origlang",
 	    		"title": "origlang",
 	    		"dcterms:description": "Language of the source content",
 	    		"dataType": "xsd:string",
-	    		"required": "true"
-	    		},				
+	    		"required": "true",
+	    		"propertyUrl": "example:origlang"
+	    	},				
 	],
 	"primaryKey":["sysid", "docId"]
     }
@@ -104,7 +120,7 @@ def SGMLToCSVW(input, output = None):
 	#if output is empty, use the same input name with a different extension
 	if output == None:
 		csvName = "{0}.csv".format(fileName)
-		csvwName = "{0}.csvw".format(fileName)
+		csvwName = "{0}.csv.csvw".format(fileName)
 
 	#make a soup with the input sgml
 	soup = BeautifulSoup(open(input))
@@ -119,7 +135,7 @@ def SGMLToCSVW(input, output = None):
 
 
 	header = ("docId", "segId", "segContents", "sysid", "genre", "origlang")
-	with open(outName, "w") as f:
+	with open(csvName, "w") as f:
 		writer = csv.writer(f)
 		writer.writerow(header)
 
@@ -131,16 +147,17 @@ def SGMLToCSVW(input, output = None):
 			for seg in doc.findAll("seg"):
 				segId = seg["id"]
 				segText = seg.string
-
+				row = docId, segId, segText, sysid, genre, origlang
+				writer.writerow(row)
 
 	csvw = template
 	head,tail = os.path.split(fileName)
 	csvw["@id"] = "http://mt.peep.ie/download/{0}.csv".format(tail)			
 	csvw["@url"] = "http://mt.peep.ie/download/{0}.csv".format(tail)
+	csvw["tableSchema"]["aboutUrl"] = "http://mt.peep.ie/download/{0}.csv/row.{{_row}}".format(tail)
+
 
 	with open(csvwName, "w") as f:
-		json.dump(csvw, f, indent = 2)
+		json.dump(csvw, f, indent = 2)		
 
-				row = docId, segId, segText, sysid, genre, origlang
-				writer.writerow(row)
-
+	return (csvName, csvwName)

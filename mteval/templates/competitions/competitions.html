@@ -22,8 +22,9 @@
 			</div>
 			<div id="collapse-{{comp._id}}" class="panel-collapse collapse">
 				<div class="panel-body">
-				<p>Upload SGML attempt</p>
 				{% if current_user.is_authenticated() %}
+				<p>Upload SGML attempt</p>
+
 					<form method = post action="/comps/upload" enctype="multipart/form-data">
 						<input type="file" name = "file" accept=".sgm, .sgml, .xml">
 						<input type = "hidden" name = "compName" value = "{{comp.compName}}"> 

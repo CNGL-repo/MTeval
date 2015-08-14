@@ -5,6 +5,9 @@ from mteval.forms import LoginForm, RegisterForm, EditTeamForm, CompetitionForm,
 from mteval.database import teamDB, compDB
 from mteval.decorators import async
 from werkzeug import secure_filename
+from mteval.rdf_from_csvw import CSVWtoRDF
+from rdflib import Graph
+from flask_rdf import flask_rdf
 import os
 import time
 
@@ -123,10 +126,42 @@ def removeCompetition(name):
 
     return redirect(url_for("competitions.competitions_home"))
 
-@competitions.route("/download/<name>")
-@login_required
+@competitions.route("/submissions")
+def submissionList():
+    comp = request.args.get("competition")
+    if comp == "":
+        comp = None
+
+    return render_template("/directoryList.html", tree = makeTree("mteval/upload", comp))
+
+def makeTree(path, comp = None):
+    tree = dict(name=os.path.basename(path), children=[])
+    try: lst = os.listdir(path)
+    except OSError:
+        pass #ignore errors
+    else:
+        for name in lst:
+            pathComp = name.split("-")[0]
+            if comp != None:
+                if comp == pathComp:
+                    fn = os.path.join(path, name)
+                    tree['children'].append(dict(name=name))
+            else:
+                tree['children'].append(dict(name=name))
+    return tree
+
+@competitions.route("/submissions/<name>")
 def downloadFile(name):
     return send_from_directory(app.config["UPLOAD_DIR"], name)
+
+
+# @competitions.route("/submissions/<name>")
+# @login_required
+# @flask_rdf
+# def showGraph(name):
+#     graph = Graph()
+#     graph.parse("{0}/{1}".format("mteval/upload", name))
+#     return graph
 
 @competitions.route("/upload", methods = ["GET", "POST"])
 @login_required
@@ -151,8 +186,7 @@ def uploadSubmission():
 
         teamDB.appendSub(subDataName, teamName, compName)
 
-    convertToCsv(filePath)
-
+    convertToCSVW(filePath)
     flash("File uploaded")
     return redirect("/")        
     
@@ -161,5 +195,9 @@ def allowedFile(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1] in app.config["ALLOWED_EXTENSIONS"]
 @async
-def convertToCsv(filename):
-    converters.SGMLToCSVW(filename)
+def convertToCSVW(filename):
+    (csvName, csvwName) = converters.SGMLToCSVW(filename)
+    g = Graph()
+    csvwConverter = CSVWtoRDF(g)
+    csvwConverter.loadCSVW(csvName, csvwFilename=csvwName)
+    csvwConverter.writeToFile("{0}.rdf".format(csvName))
