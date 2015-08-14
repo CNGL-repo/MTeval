@@ -1,4 +1,4 @@
-from mteval import app, celery, converters
+from mteval import app, converters
 from flask import Blueprint, Flask, render_template, request, send_file, redirect, url_for, Response, flash, send_from_directory
 from flask.ext.login import request, current_user, LoginManager, logout_user, login_required
 from mteval.forms import LoginForm, RegisterForm, EditTeamForm, CompetitionForm, CompetitionEditForm
