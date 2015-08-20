@@ -16,7 +16,7 @@ import json
 #blueprint for competitions
 #prefix: "/comps"
 competitions = Blueprint("competitions", __name__)
-store = HTTP4Store("http://localhost:8080")
+store = HTTP4Store("http://localhost:8989")
 
 #Competition routes
 @competitions.route("/")
