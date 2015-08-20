@@ -2,6 +2,7 @@ from rdflib import Graph, Literal, URIRef, Namespace, XSD, RDF, RDFS, BNode
 import csv
 import urllib
 import re
+import os
 from operator import itemgetter
 import sys
 
@@ -39,9 +40,9 @@ class CSVWtoRDF:
 
         if csvwFilename == None:
             csvwFilename = csvFilename + ".csvw"
-
+        fileDir = os.path.dirname(os.path.realpath(csvFilename))
         self.graph.parse(csvwFilename, format='json-ld')
-        self.graph.serialize(open("metadata.rdf", "w"), "xml")
+        self.graph.serialize(open("{0}/metadata.rdf".format(fileDir), "w"), "xml")
        
 
         #for prefix, expansion in csvwLD.namespaces():

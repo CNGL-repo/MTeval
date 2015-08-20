@@ -1,4 +1,5 @@
 # MTeval
+##Description
 Platform to organise MT Shared Tasks and automatically process the submissions
 
 An admin account is generated the first time the service is run.
@@ -21,4 +22,18 @@ is used for file uploading and storage.
 
 The service uses MongoDB through Pymongo. 
 
-Running runserver.py will run the service.  
+##Starting MTEval
+* Start 4Store (see below)
+* Ensure the configuration file (mteval/config.cfg) is correct
+* Start MTEval from the root directory
+  - python runserver.py 
+* The server should now be running on port 5005
+
+##Starting 4Store
+4Store is used as a persistent triple store for MTEval. It **must** be started before submissions are uploaded, and before SPARQL queries can be run
+
+###Start the 4store database
+4s-backend mteval
+###Start the SPARQL server
+4s-httpd -H 127.0.0.1 -p 8989 mteval
+
