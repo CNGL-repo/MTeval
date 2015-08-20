@@ -169,6 +169,8 @@ class CSVWtoRDF:
 
     def writeToFile(self, fileName, format="xml"):
         self.graph.serialize(open(fileName, "w"), format)
+        fileDir = os.path.dirname(os.path.realpath(fileName))
+        os.remove("{0}/metadata.rdf".format(fileDir))
 
 
 if __name__ == "__main__":
