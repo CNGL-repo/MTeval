@@ -2,3 +2,4 @@ venv/
 *.pyc
 upload/
 *.cfg
+dgt*

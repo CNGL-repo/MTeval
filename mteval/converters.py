@@ -9,7 +9,7 @@ template = {
 	"@id": None,
 	"@context": ["http://www.w3.org/ns/csvw",
         {
-        "example":"http://example.org/",
+        "terms":"http://mt.peep.ie/terms/",
         "@language": "en",
         "dcterms":"http://purl.org/dc/terms/",
         "xsd": "http://www.w3.org/2001/XMLSchema#",
@@ -23,95 +23,55 @@ template = {
 	    		"name": "docId",
 	    		"title": "docId",
 	    		"dcterms:description": "Id of the document",
-	    		"dataType": "xsd:string",
+	    		"datatype": "xsd:string",
 	    		"required": "true",
-	    		"propertyUrl": "example:docId"
+	    		"propertyUrl": "terms:docId"
     		},
 	    	{
 		    	"name": "segId",
 	    		"title": "segId",
 	    		"dcterms:description": "Id of the segment",
-	    		"dataType": "xsd:integer",
+	    		"datatype": "xsd:integer",
 	    		"required": "true",
-	    		"propertyUrl": "example:segId"
+	    		"propertyUrl": "terms:segId"
 	    	},
 	    	{
 	    		"name": "segContents",
 	    		"title": "segContents",
 	    		"dcterms:description": "Content of the segment",
-	    		"dataType": "xsd:string",
+	    		"datatype": "xsd:string",
 	    		"required": "true",
-	    		"propertyUrl": "example:segContents"
+	    		"propertyUrl": "terms:segContents"
 	    	},
 	    	{
 	    		"name": "sysid",
 	    		"title": "sysid",
 	    		"dcterms:description": "Id of the system",
-	    		"dataType": "xsd:string",
+	    		"datatype": "xsd:string",
 	    		"required": "true",
-	    		"propertyUrl": "example:sysid"
+	    		"propertyUrl": "terms:sysid"
 	    	},
 	    	{
 	    		"name": "genre",
 	    		"title": "genre",
 	    		"dcterms:description": "genre of the source",
-	    		"dataType": "xsd:string",
+	    		"datatype": "xsd:string",
 	    		"required": "true",
-	    		"propertyUrl": "example:genre"
+	    		"propertyUrl": "terms:genre"
 	    	},
 	    	{
 	    		"name": "origlang",
 	    		"title": "origlang",
 	    		"dcterms:description": "Language of the source content",
-	    		"dataType": "xsd:string",
+	    		"datatype": "xsd:string",
 	    		"required": "true",
-	    		"propertyUrl": "example:origlang"
+	    		"propertyUrl": "terms:origlang"
 	    	},				
 	],
 	"primaryKey":["sysid", "docId"]
     }
 }
-# class SGMLToCSV:
-# 	def __init__(self, input = None, output = None):
-# 		self.input = input
-# 		self.output = output
-# 		if input != None:
-# 			self.convert(input, output)
 
-# 	def convert(self, input, output):
-# 		outName = output
-# 		#if output is empty, use the same input name with a different extension
-# 		if output == None:
-# 			outName = "{0}.csv".format(os.path.splitext(input)[0])
-
-# 		#make a soup with the input sgml
-# 		soup = BeautifulSoup(open(input))
-
-# 		#get the first line
-# 		#Note: not using any of this information for the csv..
-# 		meta = soup.srcset
-
-# 		#find all documents so we can iterate over them
-# 		docs = soup.findAll("doc")
-		
-
-# 		header = ("docId", "segId", "segContents")
-# 		with open(output, "w") as f:
-# 			writer = csv.writer(f)
-# 			writer.writerow(header)
-
-# 			for doc in docs:
-# 				docId = doc["docid"]
-# 				for seg in doc.findAll("seg"):
-# 					segId = seg["id"]
-# 					segText = seg.string
-
-# 					row = docId, segId, segText
-# 					writer.writerow(row)
-
-# #testing
-# if __name__ == "__main__":
-# 	con = SGMLToCSV(input = "test.sgm", output = "out.csv")
 
 def SGMLToCSVW(input, output = None):
 	csvName = output

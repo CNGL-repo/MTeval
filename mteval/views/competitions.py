@@ -8,13 +8,15 @@ from werkzeug import secure_filename
 from mteval.rdf_from_csvw import CSVWtoRDF
 from rdflib import Graph
 from flask_rdf import flask_rdf
+from HTTP4Store import HTTP4Store
 import os
 import time
+import json
 
 #blueprint for competitions
 #prefix: "/comps"
 competitions = Blueprint("competitions", __name__)
-
+store = HTTP4Store("http://localhost:8080")
 
 #Competition routes
 @competitions.route("/")
@@ -133,6 +135,14 @@ def submissionList():
         comp = None
 
     return render_template("/directoryList.html", tree = makeTree("mteval/upload", comp))
+@competitions.route("/submissions/sparql", methods=["GET", "POST"])
+def submissionQuery():
+    if request.method == "POST":
+        query = request.form.get("query")
+        res = store.sparql(query)
+        return json.dumps(res, indent=4)
+
+    return render_template("sparql.html")
 
 def makeTree(path, comp = None):
     tree = dict(name=os.path.basename(path), children=[])
@@ -201,3 +211,6 @@ def convertToCSVW(filename):
     csvwConverter = CSVWtoRDF(g)
     csvwConverter.loadCSVW(csvName, csvwFilename=csvwName)
     csvwConverter.writeToFile("{0}.rdf".format(csvName))
+    filePath = "http://127.0.0.1:5005/comps/submissions/{0}.rdf".format(os.path.basename(csvName))
+    print filePath
+    store.add_from_uri(filePath)
