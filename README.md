@@ -37,3 +37,12 @@ The service uses MongoDB through Pymongo.
 ###Start the SPARQL server
 4s-httpd -H 127.0.0.1 -p 8989 mteval
 
+##Submissions
+Submissions are available at:
+/comps/submissions
+
+They can be restricted by competition by giving the parameter competition:
+/comps/submissions?competition=XXX
+
+SPARQL queries can be given at:
+/comps/submissions/sparql
